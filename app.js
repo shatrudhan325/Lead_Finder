@@ -28,6 +28,18 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // ─── Navigation ───────────────────────────────────────────────────────────────
+function openSidebar() {
+  document.getElementById('sidebar').classList.add('open');
+  document.getElementById('sidebarBackdrop').classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarBackdrop').classList.remove('show');
+  document.body.style.overflow = '';
+}
+
 function switchView(viewId, el) {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
@@ -45,6 +57,10 @@ function switchView(viewId, el) {
 
   if (viewId === 'leads') { filteredLeads = [...allLeads]; renderLeads(); }
   if (viewId === 'settings') updateSettingsPage();
+
+  // Auto-close sidebar drawer on mobile after nav
+  if (window.innerWidth <= 768) closeSidebar();
+
   return false;
 }
 

@@ -66,6 +66,7 @@ input, select, button { font-family: inherit; }
   padding: 20px 32px; border-bottom: 1px solid var(--border); background: var(--bg2); sticky-top: 0;
   position: sticky; top: 0; z-index: 50;
 }
+.topbar-left { display: flex; align-items: center; gap: 12px; min-width: 0; }
 .page-title { font-family: 'Space Grotesk', sans-serif; font-size: 1.35rem; font-weight: 700; color: var(--text); }
 .page-subtitle { font-size: 0.8rem; color: var(--text3); margin-top: 2px; }
 
@@ -507,3 +508,186 @@ select { cursor: pointer; appearance: none; background-image: url("data:image/sv
 .toast.error { border-color: var(--red); }
 .toast.info { border-color: var(--accent); }
 @keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+
+/* ─── Mobile Nav Controls ─── */
+.hamburger-btn {
+  display: none; align-items: center; justify-content: center;
+  width: 38px; height: 38px; background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 9px; cursor: pointer; color: var(--text2); transition: all 0.15s; flex-shrink: 0;
+}
+.hamburger-btn:hover { border-color: var(--accent); color: var(--accent); }
+.sidebar-close-btn {
+  display: none; align-items: center; justify-content: center;
+  margin-left: auto; width: 32px; height: 32px; background: var(--bg3);
+  border: 1px solid var(--border); border-radius: 8px; cursor: pointer;
+  color: var(--text2); transition: all 0.15s; flex-shrink: 0;
+}
+.sidebar-close-btn:hover { border-color: var(--red); color: var(--red); }
+.sidebar-backdrop {
+  display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(3px); z-index: 99;
+}
+.sidebar-backdrop.show { display: block; }
+
+/* ─── Responsive: Tablet (≤ 1024px) ─── */
+@media (max-width: 1024px) {
+  :root { --sidebar-w: 200px; }
+  .stats-grid { grid-template-columns: repeat(3, 1fr); }
+  .generate-layout { grid-template-columns: 320px 1fr; }
+  .topbar { padding: 16px 24px; }
+  .view { padding: 22px 24px; }
+}
+
+/* ─── Responsive: Mobile (≤ 768px) ─── */
+@media (max-width: 768px) {
+  /* Sidebar becomes a slide-over drawer */
+  .sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 200;
+    width: 260px;
+    box-shadow: none;
+  }
+  .sidebar.open {
+    transform: translateX(0);
+    box-shadow: 4px 0 30px rgba(0,0,0,0.5);
+  }
+  .hamburger-btn { display: flex; }
+  .sidebar-close-btn { display: flex; }
+
+  /* Main content fills full width */
+  .main-content { margin-left: 0; }
+
+  /* Topbar */
+  .topbar { padding: 12px 16px; gap: 10px; }
+  .topbar-left { gap: 10px; }
+  .page-title { font-size: 1.1rem; }
+  .page-subtitle { font-size: 0.72rem; }
+  .cta-text { display: none; }
+  .btn-primary#ctaBtn { padding: 9px 12px; }
+
+  /* Views */
+  .view { padding: 16px; }
+
+  /* Stats grid: 2 columns */
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .stat-card { padding: 16px 14px; }
+  .stat-value { font-size: 1.4rem; }
+
+  /* Generate layout: stacked */
+  .generate-layout {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  /* Leads toolbar */
+  .leads-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+  .search-box { min-width: unset; }
+  .leads-actions {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .leads-actions select { flex: 1; min-width: 120px; }
+  .btn-export { flex: 1; justify-content: center; }
+  .btn-outline { flex: 1; justify-content: center; }
+
+  /* Lead cards: single column */
+  .leads-grid { grid-template-columns: 1fr; }
+
+  /* Settings */
+  .settings-grid { grid-template-columns: 1fr; gap: 14px; }
+
+  /* Modal */
+  .modal { max-width: 100%; border-radius: 14px; }
+  .modal-overlay { padding: 12px; align-items: flex-end; }
+  .modal {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    max-height: 90vh;
+  }
+  .modal-header { padding: 20px 18px 0; }
+  .modal-body { padding: 14px 18px 20px; }
+
+  /* Download overlay */
+  .dl-card { padding: 28px 22px; min-width: unset; width: calc(100vw - 40px); }
+
+  /* Toast */
+  .toast-container { bottom: 16px; right: 12px; left: 12px; }
+  .toast { min-width: unset; max-width: 100%; }
+
+  /* Export menu */
+  .export-menu { width: 240px; right: 0; }
+
+  /* Form */
+  form { padding: 16px; gap: 14px; }
+  .panel-header { padding: 16px 18px; }
+
+  /* Rating selector */
+  .rating-selector { gap: 6px; }
+  .rating-btn { padding: 7px 4px; font-size: 0.78rem; }
+
+  /* Toggle row */
+  .toggle-row { flex-direction: row; gap: 12px; }
+}
+
+/* ─── Responsive: Small Mobile (≤ 480px) ─── */
+@media (max-width: 480px) {
+  /* Stats: 2 columns still but smaller */
+  .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .stat-card { padding: 12px 10px; gap: 10px; }
+  .stat-icon { width: 36px; height: 36px; border-radius: 9px; }
+  .stat-value { font-size: 1.2rem; }
+  .stat-label { font-size: 0.72rem; }
+
+  /* Page title */
+  .page-title { font-size: 1rem; }
+  .page-subtitle { display: none; }
+
+  /* View padding */
+  .view { padding: 12px; }
+
+  /* Generate form inside panel */
+  form { padding: 14px; }
+  .panel-header { padding: 14px 16px; }
+  .panel-header h2 { font-size: 0.88rem; }
+
+  /* Rating buttons tighter */
+  .rating-selector { gap: 5px; }
+  .rating-btn { font-size: 0.75rem; padding: 6px 2px; }
+
+  /* Feature pills wrap on mobile */
+  .feature-pills { gap: 6px; }
+  .pill { font-size: 0.7rem; padding: 3px 8px; }
+
+  /* Section card header */
+  .section-card-header { flex-direction: row; gap: 8px; padding: 14px 16px; }
+
+  /* Leads actions stack */
+  .leads-actions { flex-direction: column; }
+  .leads-actions select,
+  .btn-export,
+  .btn-outline { width: 100%; justify-content: center; }
+
+  /* Modal full screen on very small screens */
+  .modal-overlay { padding: 0; align-items: flex-end; }
+  .modal {
+    border-radius: 16px 16px 0 0;
+    max-height: 95vh;
+  }
+
+  /* Export menu becomes near full-width */
+  .export-menu { width: calc(100vw - 32px); right: auto; left: 0; }
+
+  /* Download card */
+  .dl-card { padding: 24px 18px; }
+  .dl-title { font-size: 1rem; }
+  .dl-icon-wrap { width: 60px; height: 60px; }
+}

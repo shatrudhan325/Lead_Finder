@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LeadFinder — AI-Powered Google Maps Lead Generation</title>
+  <meta name="description" content="Generate high-quality business leads from Google Maps using Apify's powerful scraper. Target any niche, location, and category with real-time data." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- Sidebar Navigation -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <span class="logo-text">LeadFinder</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a href="#" class="nav-item active" data-view="dashboard" onclick="switchView('dashboard', this)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Dashboard
+      </a>
+      <a href="#" class="nav-item" data-view="generate" onclick="switchView('generate', this)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        Find Leads
+      </a>
+      <a href="#" class="nav-item" data-view="leads" onclick="switchView('leads', this)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        My Leads
+      </a>
+      <a href="#" class="nav-item" data-view="settings" onclick="switchView('settings', this)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93L17.66 6.34M6.34 17.66L4.93 19.07M4.93 4.93L6.34 6.34M17.66 17.66L19.07 19.07M2 12H4M20 12H22M12 2V4M12 20V22"/></svg>
+        Settings
+      </a>
+    </nav>
+
+    <div class="sidebar-bottom">
+      <div class="api-status" id="apiStatus">
+        <div class="status-dot inactive" id="statusDot"></div>
+        <span id="statusText">No API Key</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Top Bar -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <h1 class="page-title" id="pageTitle">Dashboard</h1>
+        <p class="page-subtitle" id="pageSubtitle">Welcome back — your lead pipeline at a glance</p>
+      </div>
+      <div class="topbar-right">
+        <button class="btn-primary" onclick="switchView('generate', document.querySelector('[data-view=generate]'))" id="ctaBtn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Generate Leads
+        </button>
+      </div>
+    </header>
+
+    <!-- DASHBOARD VIEW -->
+    <section class="view active" id="view-dashboard">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon teal">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+          </div>
+          <div class="stat-info">
+            <span class="stat-value" id="totalLeads">0</span>
+            <span class="stat-label">Total Leads</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon purple">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          </div>
+          <div class="stat-info">
+            <span class="stat-value" id="totalRuns">0</span>
+            <span class="stat-label">Scrape Runs</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon gold">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </div>
+          <div class="stat-info">
+            <span class="stat-value" id="avgRating">—</span>
+            <span class="stat-label">Avg. Rating</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon green">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13.5a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 2.69h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l.81-.81a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          </div>
+          <div class="stat-info">
+            <span class="stat-value" id="withPhone">0</span>
+            <span class="stat-label">With Phone</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:rgba(239,68,68,0.1);color:#ef4444">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          </div>
+          <div class="stat-info">
+            <span class="stat-value" id="totalCostSpent" style="font-size:1.3rem">$0.00</span>
+            <span class="stat-label">Total Cost Spent</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Leads Preview -->
+      <div class="section-card" id="recentLeadsSection">
+        <div class="section-card-header">
+          <h2>Recent Leads</h2>
+          <button class="btn-ghost" onclick="switchView('leads', document.querySelector('[data-view=leads]'))">View All →</button>
+        </div>
+        <div id="recentLeadsContent">
+          <div class="empty-state">
+            <div class="empty-icon">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            </div>
+            <h3>No leads yet</h3>
+            <p>Run your first lead generation to see results here</p>
+            <button class="btn-primary" onclick="switchView('generate', document.querySelector('[data-view=generate]'))">
+              Start Finding Leads
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- GENERATE LEADS VIEW -->
+    <section class="view" id="view-generate">
+      <div class="generate-layout">
+        <!-- Input Panel -->
+        <div class="input-panel">
+          <div class="panel-header">
+            <div class="panel-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            </div>
+            <div>
+              <h2>Configure Search</h2>
+              <p>Set your lead generation parameters</p>
+            </div>
+          </div>
+
+          <form id="leadForm" onsubmit="generateLeads(event)">
+            <!-- API Key -->
+            <div class="form-group">
+              <label for="apiKey">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+                Apify API Key <span class="required">*</span>
+              </label>
+              <div class="input-wrapper">
+                <input type="password" id="apiKey" placeholder="apify_api_xxxxxxxxxxxxxx" required autocomplete="off" />
+                <button type="button" class="input-toggle" onclick="toggleApiKey()" id="apiKeyToggle">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                </button>
+              </div>
+              <span class="field-hint">Get your key from <a href="https://console.apify.com/settings/integrations" target="_blank">Apify Console → Settings → Integrations</a></span>
+            </div>
+
+            <!-- Search Query -->
+            <div class="form-group">
+              <label for="searchQuery">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                Business Type / Search Query <span class="required">*</span>
+              </label>
+              <input type="text" id="searchQuery" placeholder="e.g. dentist, plumber, restaurant, law firm" required />
+              <span class="field-hint">What kind of business are you looking for?</span>
+            </div>
+
+            <!-- Location -->
+            <div class="form-group">
+              <label for="location">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                Location <span class="required">*</span>
+              </label>
+              <input type="text" id="location" placeholder="e.g. New York, NY, USA" required />
+            </div>
+
+            <!-- Max Results -->
+            <div class="form-group">
+              <label for="maxResults">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+                Max Results
+              </label>
+              <select id="maxResults" onchange="updateCostEstimate()">
+                <option value="20">20 leads (fastest)</option>
+                <option value="50" selected>50 leads</option>
+                <option value="100">100 leads</option>
+                <option value="200">200 leads</option>
+              </select>
+            </div>
+
+            <!-- Cost Estimator -->
+            <div class="cost-estimator" id="costEstimator">
+              <div class="cost-estimator-header">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                Estimated Cost
+              </div>
+              <div class="cost-estimator-body">
+                <div class="cost-row">
+                  <span class="cost-label">Scrape cost</span>
+                  <span class="cost-value" id="costScrape">~$0.11</span>
+                </div>
+                <div class="cost-row">
+                  <span class="cost-label">Platform fee (est.)</span>
+                  <span class="cost-value" id="costPlatform">~$0.02</span>
+                </div>
+                <div class="cost-divider"></div>
+                <div class="cost-row total">
+                  <span class="cost-label">Total estimate</span>
+                  <span class="cost-value total" id="costTotal">~$0.13</span>
+                </div>
+                <p class="cost-note">Based on $2.10 / 1,000 places · <a href="https://apify.com/compass/crawler-google-places/pricing" target="_blank">Apify pricing ↗</a></p>
+              </div>
+            </div>
+
+            <!-- Min Rating Filter -->
+            <div class="form-group">
+              <label>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                Minimum Rating
+              </label>
+              <div class="rating-selector">
+                <button type="button" class="rating-btn active" data-rating="0" onclick="setRating(0, this)">Any</button>
+                <button type="button" class="rating-btn" data-rating="3" onclick="setRating(3, this)">3+</button>
+                <button type="button" class="rating-btn" data-rating="4" onclick="setRating(4, this)">4+</button>
+                <button type="button" class="rating-btn" data-rating="4.5" onclick="setRating(4.5, this)">4.5+</button>
+              </div>
+              <input type="hidden" id="minRating" value="0" />
+            </div>
+
+            <!-- Language -->
+            <div class="form-group">
+              <label for="language">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                Language
+              </label>
+              <select id="language">
+                <option value="en">English</option>
+                <option value="es">Spanish</option>
+                <option value="fr">French</option>
+                <option value="de">German</option>
+                <option value="pt">Portuguese</option>
+                <option value="ar">Arabic</option>
+                <option value="hi">Hindi</option>
+                <option value="zh">Chinese</option>
+              </select>
+            </div>
+
+            <!-- Scrape Contacts Toggle -->
+            <div class="toggle-row">
+              <div class="toggle-info">
+                <span class="toggle-label">Scrape Emails from Websites</span>
+                <span class="toggle-desc">Slower but finds email addresses · adds ~10–30 min</span>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="scrapeContacts" />
+                <span class="toggle-knob"></span>
+              </label>
+            </div>
+
+            <button type="submit" class="btn-generate" id="generateBtn">
+              <span class="btn-text">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                Generate Leads
+              </span>
+              <span class="btn-loading hidden">
+                <span class="spinner"></span>
+                Scraping Google Maps...
+              </span>
+            </button>
+          </form>
+        </div>
+
+        <!-- Progress / Results Preview Panel -->
+        <div class="output-panel">
+          <div class="panel-header">
+            <div class="panel-icon green-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            </div>
+            <div>
+              <h2>Live Results</h2>
+              <p>Results will appear here as they stream in</p>
+            </div>
+          </div>
+
+          <div class="progress-section hidden" id="progressSection">
+            <div class="progress-status">
+              <div class="pulse-dot"></div>
+              <span id="progressStatus">Initializing scraper...</span>
+              <span class="progress-timer" id="progressTimer">0s</span>
+            </div>
+            <div class="progress-bar-wrap">
+              <div class="progress-bar" id="progressBar" style="width:0%"></div>
+            </div>
+            <div class="progress-stats">
+              <span>Leads found: <strong id="progressCount">0</strong></span>
+              <span id="progressEta">Estimating time...</span>
+            </div>
+            <div class="progress-cost-row">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+              Est. cost for this run: <strong id="progressCost">~$0.13</strong>
+            </div>
+            <div class="progress-actions">
+              <button class="btn-check-now" id="checkNowBtn" onclick="checkStatusNow()">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+                Check Now
+              </button>
+              <a class="btn-apify-link" id="apifyConsoleLink" href="https://console.apify.com/actors/runs" target="_blank">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                View in Apify Console
+              </a>
+            </div>
+          </div>
+
+          <div class="results-preview" id="resultsPreview">
+            <div class="idle-state">
+              <div class="idle-animation">
+                <div class="idle-rings">
+                  <div class="ring ring1"></div>
+                  <div class="ring ring2"></div>
+                  <div class="ring ring3"></div>
+                </div>
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              </div>
+              <h3>Ready to Hunt</h3>
+              <p>Configure your search and click "Generate Leads" to start pulling real business data from Google Maps</p>
+              <div class="feature-pills">
+                <span class="pill">📍 Business Name</span>
+                <span class="pill">📞 Phone Number</span>
+                <span class="pill">🌐 Website</span>
+                <span class="pill">⭐ Rating</span>
+                <span class="pill">📧 Address</span>
+                <span class="pill">🕒 Hours</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MY LEADS VIEW -->
+    <section class="view" id="view-leads">
+      <div class="leads-toolbar">
+        <div class="search-box">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input type="text" id="leadsSearch" placeholder="Search leads by name, email, phone..." oninput="filterLeads()" />
+          <span class="search-badge" id="searchBadge">0</span>
+        </div>
+        <div class="leads-actions">
+          <select id="sortLeads" onchange="sortLeadsData()">
+            <option value="newest">Newest First</option>
+            <option value="rating">Highest Rating</option>
+            <option value="name">Name A-Z</option>
+          </select>
+
+          <!-- Export Dropdown -->
+          <div class="export-dropdown" id="exportDropdown">
+            <button class="btn-export" onclick="toggleExportMenu()" id="exportTrigger">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Export
+              <span class="export-count" id="exportCount">0</span>
+              <svg class="export-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="export-menu hidden" id="exportMenu">
+              <div class="export-menu-header">Download as</div>
+              <button class="export-option" onclick="exportLeads('csv')">
+                <div class="export-option-icon csv-icon">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                </div>
+                <div class="export-option-text">
+                  <span class="export-option-name">CSV Spreadsheet</span>
+                  <span class="export-option-desc">Open in Excel, Google Sheets</span>
+                </div>
+                <span class="export-option-size" id="csvSize">—</span>
+              </button>
+              <button class="export-option" onclick="exportLeads('json')">
+                <div class="export-option-icon json-icon">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                </div>
+                <div class="export-option-text">
+                  <span class="export-option-name">JSON Data</span>
+                  <span class="export-option-desc">For developers &amp; APIs</span>
+                </div>
+                <span class="export-option-size" id="jsonSize">—</span>
+              </button>
+            </div>
+          </div>
+
+          <button class="btn-outline danger" onclick="clearAllLeads()" id="clearLeadsBtn">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+            Clear All
+          </button>
+        </div>
+      </div>
+
+      <div id="leadsContainer">
+        <div class="empty-state">
+          <div class="empty-icon">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <h3>No leads in your collection</h3>
+          <p>Generate your first batch of leads to start building your pipeline</p>
+          <button class="btn-primary" onclick="switchView('generate', document.querySelector('[data-view=generate]'))">
+            Find Leads Now
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- SETTINGS VIEW -->
+    <section class="view" id="view-settings">
+      <div class="settings-grid">
+        <div class="settings-card">
+          <div class="settings-card-header">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+            <h3>API Configuration</h3>
+          </div>
+          <div class="form-group">
+            <label for="settingsApiKey">Apify API Key</label>
+            <div class="input-wrapper">
+              <input type="password" id="settingsApiKey" placeholder="apify_api_xxxxxxxxxxxxxx" />
+              <button type="button" class="input-toggle" onclick="toggleSettingsApiKey()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+          </div>
+          <button class="btn-primary" onclick="saveApiKey()">Save API Key</button>
+          <p class="settings-help">Your API key is stored only in your browser's local storage. <a href="https://console.apify.com/settings/integrations" target="_blank">Get your key →</a></p>
+        </div>
+
+        <div class="settings-card">
+          <div class="settings-card-header">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+            <h3>Actor Configuration</h3>
+          </div>
+          <div class="form-group">
+            <label for="actorId">Actor ID</label>
+            <input type="text" id="actorId" value="compass/crawler-google-places" />
+            <span class="field-hint">Default: compass/crawler-google-places</span>
+          </div>
+          <button class="btn-primary" onclick="saveActorId()">Save Actor ID</button>
+        </div>
+
+        <div class="settings-card">
+          <div class="settings-card-header">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+            <h3>Data Management</h3>
+          </div>
+          <p class="settings-help">All leads are stored in your browser's local storage.</p>
+          <div class="settings-stats">
+            <div class="setting-stat">
+              <span class="setting-stat-value" id="settingsTotalLeads">0</span>
+              <span class="setting-stat-label">Total Leads Saved</span>
+            </div>
+            <div class="setting-stat">
+              <span class="setting-stat-value" id="settingsStorageSize">0 KB</span>
+              <span class="setting-stat-label">Storage Used</span>
+            </div>
+          </div>
+          <button class="btn-outline danger" onclick="clearAllLeads()" style="margin-top:1rem;">Clear All Data</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Toast Notification -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Lead Detail Modal -->
+  <div class="modal-overlay hidden" id="modalOverlay" onclick="closeModal(event)">
+    <div class="modal" id="modal">
+      <button class="modal-close" onclick="closeModal()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+      <div id="modalContent"></div>
+    </div>
+  </div>
+
+  <!-- Download Progress Overlay -->
+  <div class="dl-overlay hidden" id="dlOverlay">
+    <div class="dl-card">
+      <div class="dl-icon-wrap" id="dlIconWrap">
+        <svg class="dl-icon-svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      </div>
+      <h3 class="dl-title" id="dlTitle">Preparing your file...</h3>
+      <p class="dl-subtitle" id="dlSubtitle">Building export data</p>
+      <div class="dl-progress-wrap">
+        <div class="dl-progress-bar" id="dlProgressBar"></div>
+      </div>
+      <div class="dl-meta" id="dlMeta">
+        <span id="dlRows">0 leads</span>
+        <span id="dlSize">0 KB</span>
+        <span id="dlFormat">CSV</span>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

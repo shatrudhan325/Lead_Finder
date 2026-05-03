@@ -523,6 +523,13 @@ select { cursor: pointer; appearance: none; background-image: url("data:image/sv
   color: var(--text2); transition: all 0.15s; flex-shrink: 0;
 }
 .sidebar-close-btn:hover { border-color: var(--red); color: var(--red); }
+
+/* ─── Force hide mobile-only controls on desktop/laptop ─── */
+@media (min-width: 769px) {
+  .hamburger-btn { display: none !important; }
+  .sidebar-close-btn { display: none !important; }
+  .sidebar-backdrop { display: none !important; }
+}
 .sidebar-backdrop {
   display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6);
   backdrop-filter: blur(3px); z-index: 99;
